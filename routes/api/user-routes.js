@@ -4,8 +4,20 @@ const { User } = require('../../models');
 // GET /api/users
 router.get('/', (req, res) => {
   // Access our User model and run .findAll() method)
-  User.findAll()
-    .then(dbUserData => res.json(dbUserData))
+  User.findAll({
+    attributes: {exclude: ['password']},
+    where : {
+      id: req.params.id
+    }
+  })
+    .then(dbUserData =>{
+      if (!dbUserData) {
+        res.status (404).json({message: 'No user found with this id'});
+        return;
+      }
+
+      res.json(dbUserData);
+    }) 
     .catch(err => {
       console.log(err);
       res.status(500).json(err);
